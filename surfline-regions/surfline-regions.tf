@@ -63,10 +63,6 @@ resource "aws_instance" "surfliner_build" {
     "${aws_security_group.allow_outbound.name}"
   ]
 
-  provisioner "local-exec" {
-    command = "echo ${aws_instance.surfliner_build.public_ip} > build_ip_address.txt"
-  }
-
   tags {
     Name = "SurflineR Build"
   }
@@ -82,10 +78,6 @@ resource "aws_instance" "surfliner_prod" {
     "${aws_security_group.allow_http.name}",
     "${aws_security_group.allow_outbound.name}"
   ]
-
-  provisioner "local-exec" {
-    command = "echo ${aws_instance.surfliner_prod.public_ip} > prod_ip_address.txt"
-  }
 
   tags {
     Name = "SurflineR Prod"
