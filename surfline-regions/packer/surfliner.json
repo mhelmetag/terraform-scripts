@@ -1,0 +1,64 @@
+{
+  "variables": {
+    "aws_access_key": "",
+    "aws_secret_key": ""
+  },
+  "builders": [
+    {
+      "type": "amazon-ebs",
+      "ami_name": "surfliner-aws-{{timestamp}}",
+      "access_key": "{{user `aws_access_key`}}",
+      "secret_key": "{{user `aws_secret_key`}}",
+      "region": "us-west-2",
+      "source_ami_filter": {
+        "filters": {
+          "virtualization-type": "hvm",
+          "name": "ubuntu/images/*ubuntu-xenial-16.04-amd64-server-*",
+          "root-device-type": "ebs"
+        },
+        "owners": [
+          "099720109477"
+        ],
+        "most_recent": true
+      },
+      "instance_type": "t2.micro",
+      "ssh_username": "ubuntu"
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "shell",
+      "inline": [
+        "sleep 30",
+        "sudo apt-get -qq update",
+        "sudo apt-get install -y postgresql postgresql-contrib nginx",
+        "sudo mkdir -p /etc/nginx/sites-available",
+        "sudo mkdir -p /etc/nginx/sites-enabled",
+        "echo '# set PORT for pheonix\nPORT=8888'"
+      ]
+    },
+    {
+      "type": "file",
+      "source": "./surfliner",
+      "destination": "/home/ubuntu/surfliner"
+    },
+    {
+      "type": "file",
+      "source": "./surfliner.service",
+      "destination": "/home/ubuntu/surfliner.service"
+    },
+    {
+      "type": "shell",
+      "inline": [
+        "sudo -u postgres createdb surfline_regions_prod",
+        "sudo ufw allow 'Nginx HTTP'",
+        "sudo mv /home/ubuntu/surfliner /etc/nginx/sites-available/surfliner",
+        "sudo mv /home/ubuntu/surfliner.service /lib/systemd/system/surfliner.service",
+        "sudo ln -s /etc/nginx/sites-available/surfliner /etc/nginx/sites-enabled/surfliner",
+        "sudo service nginx restart",
+        "sudo systemctl enable surfliner.service",
+        "sudo systemctl daemon-reload"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+[Unit]
+Description=Phoenix server for Surfliner app
+After=network.target
+
+[Service]
+User=ubuntu
+Group=ubuntu
+Restart=on-failure
+
+Environment=HOME=/home/ubuntu/surfline_regions
+Environment=PORT=8888
+
+ExecStart=/home/ubuntu/surfline_regions/bin/surfline_regions foreground
+ExecStop=/home/ubuntu/surfline_regions/bin/surfline_regions stop
+
+[Install]
+WantedBy=multi-user.target
