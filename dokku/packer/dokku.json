@@ -1,0 +1,46 @@
+{
+    "variables": {
+      "aws_access_key": "",
+      "aws_secret_key": ""
+    },
+    "builders": [
+      {
+        "type": "amazon-ebs",
+        "ami_name": "dokku-aws-{{timestamp}}",
+        "access_key": "{{user `aws_access_key`}}",
+        "secret_key": "{{user `aws_secret_key`}}",
+        "region": "us-west-2",
+        "source_ami_filter": {
+          "filters": {
+            "virtualization-type": "hvm",
+            "name": "ubuntu/images/*ubuntu-bionic-18.04-amd64-server-*",
+            "root-device-type": "ebs"
+          },
+          "owners": [
+            "099720109477"
+          ],
+          "most_recent": true
+        },
+        "instance_type": "t2.micro",
+        "ssh_username": "ubuntu"
+      }
+    ],
+    "provisioners": [
+      {
+        "type": "shell",
+        "inline": [
+          "wget https://raw.githubusercontent.com/dokku/dokku/v0.19.13/bootstrap.sh",
+          "sudo DOKKU_TAG=v0.19.13 bash bootstrap.sh"
+        ]
+      },
+      {
+        "type": "shell",
+        "inline": [
+          "sudo apt-get install fail2ban",
+          "sudo cp /etc/fail2ban/jail.conf /etc/fail2ban/jail.local",
+          "sudo service fail2ban restart"
+        ]
+      }
+    ]
+  }
+  
