@@ -1,6 +1,6 @@
 # Dokku
 
-A collection of terraform, packer, nginx, and systemd scripts to build out and configure the build out my own heroku.
+A collection of terraform, packer, nginx, and systemd scripts to build out and configure my own heroku.
 
 ## Cheatsheet
 
